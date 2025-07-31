@@ -1,40 +1,40 @@
 const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
+const multer = require('multer');
+const xlsx = require('xlsx');
 const fs = require('fs');
 const path = require('path');
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-let customers = [];
-let inventory = [];
-let prices = {};
+// تنظیم ذخیره فایل‌ها در پوشه uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, 'inventory.xlsx'); // فایل آپلودی همیشه همین اسم رو می‌گیره
+  }
+});
+const upload = multer({ storage });
 
 app.get('/', (req, res) => {
-    res.send('Yadak Market App is running!');
+  res.send('✅ Yadak Market App is running and ready for Excel upload!');
 });
 
-// Upload inventory Excel file
-app.post('/upload/inventory', upload.single('file'), (req, res) => {
-    res.send('Inventory uploaded');
-});
+// مسیر آپلود اکسل
+app.post('/upload-inventory', upload.single('file'), (req, res) => {
+  const filePath = path.join(__dirname, 'uploads', 'inventory.xlsx');
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-// Search item
-app.get('/search', (req, res) => {
-    const query = req.query.q.toLowerCase();
-    const results = inventory.filter(item =>
-        item.name.toLowerCase().includes(query) || item.code.toLowerCase().includes(query)
-    );
-    if (results.length > 0) {
-        res.json({ status: 'available', items: results });
-    } else {
-        res.json({ status: 'not found' });
-    }
+  // ذخیره داده‌ها در فایل JSON
+  fs.writeFileSync('data/inventory.json', JSON.stringify(data, null, 2));
+  res.send('📦 فایل موجودی با موفقیت آپلود و پردازش شد.');
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
+
