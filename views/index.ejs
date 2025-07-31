@@ -4,34 +4,35 @@
   <meta charset="UTF-8">
   <title>Yadak Market App</title>
 </head>
-<body dir="rtl">
-  <h1>آپلود موجودی</h1>
+<body>
+  <h1>آپلود فایل اکسل</h1>
   <form action="/upload" method="POST" enctype="multipart/form-data">
-    <input type="file" name="excel" required>
-    <button type="submit">بارگذاری فایل</button>
+    <input type="file" name="excelFile" accept=".xlsx, .xls" required>
+    <button type="submit">بارگذاری</button>
   </form>
 
-  <hr>
-
-  <h2>جستجوی کالا</h2>
-  <form action="/search" method="GET">
-    <input type="text" name="query" placeholder="نام یا کد کالا را وارد کنید" required>
-    <button type="submit">جستجو</button>
-  </form>
-
-  <% if (result) { %>
-    <% if (result.found) { %>
-      <h3>✅ کالا موجود است:</h3>
-      <ul>
-        <li><strong>نام:</strong> <%= result.data.name %></li>
-        <li><strong>کد:</strong> <%= result.data.code %></li>
-        <li><strong>قیمت:</strong> <%= result.data.price %></li>
-        <li><strong>برند:</strong> <%= result.data.brand %></li>
-      </ul>
-    <% } else { %>
-      <h3>❌ کالا در موجودی یافت نشد.</h3>
-    <% } %>
+  <% if (data && data.length > 0) { %>
+    <h2>داده‌های خوانده‌شده:</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <% Object.keys(data[0]).forEach(key => { %>
+            <th><%= key %></th>
+          <% }) %>
+        </tr>
+      </thead>
+      <tbody>
+        <% data.forEach(row => { %>
+          <tr>
+            <% Object.values(row).forEach(val => { %>
+              <td><%= val %></td>
+            <% }) %>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
   <% } %>
 </body>
 </html>
+
 
