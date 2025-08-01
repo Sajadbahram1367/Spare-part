@@ -1,15 +1,66 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>آپلود فایل موجودی</title>
+  <title>نمایش موجودی</title>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 6px;
+    }
+    #searchInput {
+      margin-bottom: 10px;
+      padding: 6px;
+      width: 250px;
+    }
+  </style>
 </head>
 <body>
-  <h2>آپلود فایل موجودی اکسل</h2>
-  <form action="/upload-inventory" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".xlsx" required />
-    <button type="submit">بارگذاری فایل</button>
-  </form>
+  <h2>نتیجه فایل آپلود شده</h2>
+
+  <!-- جستجو -->
+  <input type="text" id="searchInput" placeholder="جستجو...">
+
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <% if (data.length > 0) { %>
+          <% Object.keys(data[0]).forEach(key => { %>
+            <th><%= key %></th>
+          <% }); %>
+        <% } %>
+      </tr>
+    </thead>
+    <tbody>
+      <% data.forEach(row => { %>
+        <tr>
+          <% Object.values(row).forEach(value => { %>
+            <td><%= value %></td>
+          <% }); %>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <script>
+    const input = document.getElementById("searchInput");
+    input.addEventListener("keyup", function () {
+      const filter = input.value.toLowerCase();
+      const rows = document.querySelectorAll("#dataTable tbody tr");
+
+      rows.forEach(row => {
+        const rowText = row.textContent.toLowerCase();
+        if (rowText.includes(filter)) {
+          row.style.display = "";
+        } else {
+          row.style.display = "none";
+        }
+      });
+    });
+  </script>
 </body>
 </html>
 
