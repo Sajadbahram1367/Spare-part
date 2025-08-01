@@ -2,42 +2,51 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>نمایش موجودی</title>
+  <title>نتیجه فایل اکسل</title>
   <style>
-    table, th, td {
-      border: 1px solid black;
+    table {
       border-collapse: collapse;
+      width: 100%;
     }
     th, td {
-      padding: 6px;
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
     }
     #searchInput {
-      margin-bottom: 10px;
-      padding: 6px;
-      width: 250px;
+      margin: 10px 0;
+      padding: 8px;
+      width: 300px;
     }
   </style>
 </head>
 <body>
-  <h2>نتیجه فایل آپلود شده</h2>
+  <h2>نتیجه فایل اکسل</h2>
 
-  <!-- جستجو -->
-  <input type="text" id="searchInput" placeholder="جستجو...">
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="excelFile" />
+    <button type="submit">بارگذاری فایل</button>
+  </form>
 
-  <table id="dataTable">
+  <input type="text" id="searchInput" placeholder="جستجو در جدول..." onkeyup="filterTable()" />
+
+  <table id="excelTable">
     <thead>
       <tr>
         <% if (data.length > 0) { %>
-          <% Object.keys(data[0]).forEach(key => { %>
+          <% Object.keys(data[0]).forEach(function(key) { %>
             <th><%= key %></th>
           <% }); %>
         <% } %>
       </tr>
     </thead>
     <tbody>
-      <% data.forEach(row => { %>
+      <% data.forEach(function(row) { %>
         <tr>
-          <% Object.values(row).forEach(value => { %>
+          <% Object.values(row).forEach(function(value) { %>
             <td><%= value %></td>
           <% }); %>
         </tr>
@@ -46,20 +55,28 @@
   </table>
 
   <script>
-    const input = document.getElementById("searchInput");
-    input.addEventListener("keyup", function () {
+    function filterTable() {
+      const input = document.getElementById("searchInput");
       const filter = input.value.toLowerCase();
-      const rows = document.querySelectorAll("#dataTable tbody tr");
+      const table = document.getElementById("excelTable");
+      const rows = table.getElementsByTagName("tr");
 
-      rows.forEach(row => {
-        const rowText = row.textContent.toLowerCase();
-        if (rowText.includes(filter)) {
-          row.style.display = "";
-        } else {
-          row.style.display = "none";
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const cells = row.getElementsByTagName("td");
+        let match = false;
+
+        for (let j = 0; j < cells.length; j++) {
+          const cell = cells[j];
+          if (cell && cell.innerText.toLowerCase().includes(filter)) {
+            match = true;
+            break;
+          }
         }
-      });
-    });
+
+        row.style.display = match ? "" : "none";
+      }
+    }
   </script>
 </body>
 </html>
