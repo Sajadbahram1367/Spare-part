@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>Yadak Market Upload</title>
+  <style>
+    body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; }
+    h1 { color: #333; }
+    input[type="file"], button { margin: 10px 0; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: right; }
+    th { background-color: #f2f2f2; }
+    #searchInput { width: 100%; padding: 8px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <h1>آپلود فایل اکسل</h1>
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="excel" required>
+    <button type="submit">بارگذاری</button>
+  </form>
+
+  <% if (rows && rows.length > 0) { %>
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="جستجو در جدول...">
+    <table id="excelTable">
+      <thead>
+        <tr>
+          <% Object.keys(rows[0]).forEach(col => { %>
+            <th><%= col %></th>
+          <% }) %>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach(row => { %>
+          <tr>
+            <% Object.values(row).forEach(cell => { %>
+              <td><%= cell %></td>
+            <% }) %>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <script>
+    function searchTable() {
+      let input = document.getElementById("searchInput");
+      let filter = input.value.toLowerCase();
+      let table = document.getElementById("excelTable");
+      let rows = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < rows.length; i++) {
+        let cells = rows[i].getElementsByTagName("td");
+        let match = false;
+
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerText.toLowerCase().includes(filter)) {
+            match = true;
+            break;
+          }
+        }
+
+        rows[i].style.display = match ? "" : "none";
+      }
+    }
+  </script>
+
+</body>
+</html>
